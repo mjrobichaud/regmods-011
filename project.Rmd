@@ -1,0 +1,67 @@
+---
+title: 'Motor Trend Analysis: regmods-011'
+author: "mjrobichaud"
+date: "February 21, 2015"
+output: pdf_document
+---
+
+## Executive Summary
+From the analysis detailed below, it can be determined that transmission has a significant effect on fuel economy, with manual transmissions having a 7.24 mpg improvement on average.
+
+## Loading Data and Exploratory Analysis
+
+First, we need to load the mtcars analysis
+```{r}
+data(mtcars)
+names(mtcars)
+```
+
+Using ?mtcars, we can get a description for the dataset. The relevant factor for this analysis is the transmission
+
+[, 9]  am	Transmission (0 = automatic, 1 = manual)
+
+Specifically, we're interested in knowing the transmission type and its effect on fuel economy (MPG)
+
+See appendix for boxplot of mpg range for transmission type.
+
+## Answering The First Question
+“Is an automatic or manual transmission better for MPG”
+
+To answer this question, we first look at the mean fuel economy aggregated by transmission type:
+```{r}
+aggregate(mpg~am, data = mtcars, mean)
+```
+
+This shows that manual transmissions, on average, have better fuel economny than automatic transmissions.
+
+A simple t-test will allow us to reject the null hypothesis, that automatic transmissions average better fuel economy than manual transmissions:
+```{r}
+m_trans_data <- mtcars[mtcars$am == 1,]
+a_trans_data <- mtcars[mtcars$am == 0,]
+
+t.test(m_trans_data$mpg, a_trans_data$mpg)
+```
+A p-value of 0.001374 allows us to reject this null hypothesis.
+
+## Answering The Second Question
+"Quantify the MPG difference between automatic and manual transmissions"
+
+First, we can create a regression model:
+```{r}
+model <- lm(mpg~am, data = mtcars)
+summary(model)
+```
+The summary shows that the adjusted R-squared value is 0.3385, meaning that transmission type only accounts for 33.9% of the variance. The difference is 7.24 mpg.
+
+\pagebreak
+
+## Appendix
+```{r}
+boxplot(mpg~am,
+        data = mtcars,
+        main = "Fuel Economy by Transmission Type",
+        xlab = "Transmission Type",
+        ylab = "Fuel Economy (mpg)",
+        names = c("Automatic", "Manual"))
+```
+
